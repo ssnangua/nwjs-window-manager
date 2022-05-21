@@ -1,0 +1,12 @@
+.vscode
+.DS_Store
+docs
+images
+lib
+node_modules
+rollup
+src
+temp
+api-extractor.json
+rollup.config.js
+tsconfig.json

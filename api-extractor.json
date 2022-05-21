@@ -1,0 +1,21 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+  "mainEntryPointFilePath": "<projectFolder>/lib/window-manager.d.ts",
+  "bundledPackages": [],
+  "compiler": { "tsconfigFilePath": "<projectFolder>/tsconfig.json" },
+  "apiReport": { "enabled": false },
+  "docModel": { "enabled": true },
+  "dtsRollup": {
+    "enabled": true,
+    "untrimmedFilePath": "<projectFolder>/dist/nwjs-window-manager.d.ts"
+  },
+  "tsdocMetadata": {
+    "enabled": true,
+    "tsdocMetadataFilePath": "<projectFolder>/temp/tsdoc-metadata.json"
+  },
+  "messages": {
+    "compilerMessageReporting": { "default": { "logLevel": "warning" } },
+    "extractorMessageReporting": { "default": { "logLevel": "warning" } },
+    "tsdocMessageReporting": { "default": { "logLevel": "warning" } }
+  }
+}

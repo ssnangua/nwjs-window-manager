@@ -1,0 +1,54 @@
+{
+  "name": "nwjs-window-manager",
+  "version": "1.0.0",
+  "description": "Window manager for NW.js.",
+  "scripts": {
+    "tsc": "tsc",
+    "rollup": "rollup -c rollup.config.js",
+    "api": "api-extractor run --local",
+    "doc": "api-documenter markdown -i ./temp -o ./docs/api",
+    "build": "npm run tsc && npm run rollup && npm run api && npm run doc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "jsdelivr": "./dist/nwjs-window-manager.js",
+  "unpkg": "./dist/nwjs-window-manager.js",
+  "typings": "./dist/nwjs-window-manager.d.ts",
+  "browser": "./dist/nwjs-window-manager.esm-bundler.js",
+  "module": "./dist/nwjs-window-manager.esm-bundler.js",
+  "main": "./index.js",
+  "keywords": [
+    "nwjs",
+    "window-manager"
+  ],
+  "author": "ssnangua",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ssnangua/nwjs-window-manager"
+  },
+  "files": [
+    "dist",
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@microsoft/api-documenter": "^7.17.14",
+    "@microsoft/api-extractor": "^7.24.0",
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-image": "^2.1.1",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-replace": "^4.0.0",
+    "@types/node": "^17.0.33",
+    "@types/nw.js": "^0.13.14",
+    "rollup": "^2.73.0",
+    "rollup-plugin-html": "^0.2.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "^4.6.4",
+    "tslib": "^2.4.0"
+  }
+}
