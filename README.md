@@ -130,7 +130,7 @@ Returns `WM_Window | undefined` - Returns wm window if `maybeWin` is valid, othe
 
 Open a new WM_Window.
 
-- `url` string (optional) - URL to be loaded in the opened window
+- `url` string - URL to be loaded in the opened window
 - `options` WM_OpenOptions (optional) - Open options
   - `name` string (optional) - Window's name.
   - `parent` WM_Window (optional) - Parent window.
@@ -179,6 +179,10 @@ wm.config({
 ```
 
 ### `WM_Window`
+
+Extends from `nw.win`, so you can use all properties and methods of `nw.win`.
+
+The following properties and methods are extended:
 
 #### `wmWin.nwWin` nw.win (readonly)
 
