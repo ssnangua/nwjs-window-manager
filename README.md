@@ -110,9 +110,11 @@ win2.$emit("from_win2", "Hello, I am win2");
 
 // You can also send messages through win1
 wm("win1").$emit("win1_on", "Hello win1, I am win2");
+// Or
+win2.parent.$emit("win1_on", "Hello win1, I am win2");
 
 // wm global message
-wm.$emit("global_msg", "Global message from win1");
+wm.$emit("global_msg", "Global message from win2");
 ```
 
 ## API
@@ -154,7 +156,7 @@ Get a WM_Window by name or nw.win.
 
 - `win` WM_Window | nw.win | string - win or win's name
 
-Returns `WM_Window`.
+Returns `WM_Window | undefined` - Returns wm window if `win` is valid, otherwise returns undefined.
 
 When `win` is omitted, will return the current WM_Window.
 
@@ -265,7 +267,7 @@ Add a one-time listener.
 
 Remove a listener.
 
-#### `wmWin.$offAll(event: string, listener: Function): WM_Window`
+#### `wmWin.$offAll(event?: string): WM_Window`
 
 Removes all listeners, or those of the specified event name.
 
