@@ -21,3 +21,13 @@ export interface WindowManager
 |  [getAll](./nwjs-window-manager.windowmanager.getall.md) | [WM\_GetAllWindow](./nwjs-window-manager.wm_getallwindow.md) |  |
 |  [open](./nwjs-window-manager.windowmanager.open.md) | [WM\_OpenWMWindow](./nwjs-window-manager.wm_openwmwindow.md) |  |
 
+## Methods
+
+|  Method | Description |
+|  --- | --- |
+|  [$emit(event, args)](./nwjs-window-manager.windowmanager._emit.md) |  |
+|  [$off(event, listener)](./nwjs-window-manager.windowmanager._off.md) |  |
+|  [$offAll(event)](./nwjs-window-manager.windowmanager._offall.md) |  |
+|  [$on(event, listener)](./nwjs-window-manager.windowmanager._on.md) |  |
+|  [$once(event, listener)](./nwjs-window-manager.windowmanager._once.md) |  |
+

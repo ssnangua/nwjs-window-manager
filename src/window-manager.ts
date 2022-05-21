@@ -40,7 +40,9 @@ function domReady(document: Document): Promise<void> {
  * @param isMaximize - Get whether the window is maximize.
  * @param open - Open a child window.
  * @param $on - Add a listener.
+ * @param $once - Add a one-time listener.
  * @param $off - Remove a listener.
+ * @param $offAll - Removes all listeners, or those of the specified event name.
  * @param $emit - Synchronously calls each of the listeners.
  *
  * @remarks
@@ -60,7 +62,9 @@ export interface WM_Window extends NWJS_Helpers.win {
   readonly isMaximize: boolean;
   open: WM_OpenWMWindow;
   $on(event: string, listener: Function): WM_Window;
+  $once(event: string, listener: Function): WM_Window;
   $off(event: string, listener: Function): WM_Window;
+  $offAll(event?: string): WM_Window;
   $emit(event: string, ...args: any[]): WM_Window;
 }
 
@@ -112,8 +116,7 @@ export interface WM_OpenOptions
  * @public
  */
 export interface WM_GetWindow {
-  (): WM_Window | undefined;
-  (win?: MaybeWindow): WM_Window | undefined;
+  (win: MaybeWindow): WM_Window | undefined;
 }
 
 /**
@@ -271,8 +274,8 @@ function open(
   });
 }
 
-function get(win?: MaybeWindow): WM_Window | undefined {
-  if (!win) return manage(nw.Window.get());
+function get(win: MaybeWindow): WM_Window | undefined {
+  if (!win) return undefined;
   if (typeof win === "string") return instances[win];
   if ("nwWin" in win) return win as WM_Window;
   if ("cWindow" in win)
@@ -418,8 +421,16 @@ function manage(
         emitter.on(event, listener);
         return wmWin;
       },
+      $once(event: string, listener: Function): WM_Window {
+        emitter.once(event, listener);
+        return wmWin;
+      },
       $off(event: string, listener: Function): WM_Window {
         emitter.off(event, listener);
+        return wmWin;
+      },
+      $offAll(event?: string): WM_Window {
+        emitter.removeAllListeners(event);
         return wmWin;
       },
       $emit(event: string, ...args: any[]): WM_Window {
@@ -568,6 +579,11 @@ function manage(
  * @param get - Get WM_Window. When `win` is omitted, will return the current WM_Window.
  * @param getAll - Get all WM_Window instances
  * @param config - Set window manager
+ * @param $on - Add a global listener.
+ * @param $once - Add a one-time global listener.
+ * @param $off - Remove a global listener.
+ * @param $offAll - Removes all global listeners, or those of the specified event name.
+ * @param $emit - Synchronously calls each of the global listeners.
  *
  * @public
  */
@@ -577,7 +593,14 @@ export interface WindowManager {
   get: WM_GetWindow;
   getAll: WM_GetAllWindow;
   config: WM_ConfigWindowManager;
+  $on(event: string, listener: Function): WindowManager;
+  $once(event: string, listener: Function): WindowManager;
+  $off(event: string, listener: Function): WindowManager;
+  $offAll(event?: string): WindowManager;
+  $emit(event: string, ...args: any[]): WindowManager;
 }
+
+const emitter = new EventEmitter();
 
 /**
  * @public
@@ -587,4 +610,25 @@ export const wm: WindowManager = Object.assign(manage, {
   get,
   getAll,
   config,
+  // Merge emitter
+  $on(event: string, listener: Function): WindowManager {
+    emitter.on(event, listener);
+    return wm;
+  },
+  $once(event: string, listener: Function): WindowManager {
+    emitter.once(event, listener);
+    return wm;
+  },
+  $off(event: string, listener: Function): WindowManager {
+    emitter.off(event, listener);
+    return wm;
+  },
+  $offAll(event?: string): WindowManager {
+    emitter.removeAllListeners(event);
+    return wm;
+  },
+  $emit(event: string, ...args: any[]): WindowManager {
+    emitter.emit.call(emitter, event, ...args);
+    return wm;
+  },
 });

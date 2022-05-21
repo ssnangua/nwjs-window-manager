@@ -84,19 +84,21 @@ win1.open("2.html", { name: "win2" }).then((win2) => {
 win1.$on("win1_on", (msg) => {
   console.log("[win1_on]", msg);
 });
+
+// wm global message
+wm.$on("global_msg", (msg) => {
+  console.log("global_msg", msg);
+});
 ```
 
 `2.html`
 
 ```js
-// Get the current WM_Window through wm.get()
-const win2 = wm.get();
+// Get win2 by the current nw window
+const win2 = wm(nw.Window.get());
 
 // Or get win2 by name
 // const win2 = wm("win2");
-
-// Or get win2 by the current nw window
-// const win2 = wm(nw.Window.get())
 
 // Listen message
 win2.$on("emit_win2", (msg) => {
@@ -108,6 +110,9 @@ win2.$emit("from_win2", "Hello, I am win2");
 
 // You can also send messages through win1
 wm("win1").$emit("win1_on", "Hello win1, I am win2");
+
+// wm global message
+wm.$emit("global_msg", "Global message from win1");
 ```
 
 ## API
@@ -143,11 +148,11 @@ Open a new WM_Window.
 
 Returns `Promise<WM_Window>` - Resolve with the opened WM_Window instance.
 
-### `wm.get([win])`
+### `wm.get(win)`
 
 Get a WM_Window by name or nw.win.
 
-- `win` WM_Window | nw.win | string (optional) - win or win's name
+- `win` WM_Window | nw.win | string - win or win's name
 
 Returns `WM_Window`.
 
@@ -160,6 +165,30 @@ Get all WM_Window instances.
 - `callback` function (optional) - Callback with array of all WM_Window instances. Generally not needed because the return is fully synchronous.
 
 Returns an array of all WM_Window instances.
+
+### wm emitter
+
+#### `wm.$on(event: string, listener: Function): WindowManager`
+
+Add a global listener.
+
+#### `wm.$once(event: string, listener: Function): WindowManager`
+
+Add a one-time global listener.
+
+#### `wm.$off(event: string, listener: Function): WindowManager`
+
+Remove a global listener.
+
+#### `wm.$offAll(event?: string): WindowManager`
+
+Removes all global listeners, or those of the specified event name.
+
+#### `wm.$emit(event: string, ...args: any[]): WindowManager`
+
+Synchronously calls each of the global listeners.
+
+###
 
 ### `wm.config(options)`
 
@@ -228,9 +257,17 @@ Open a child window. See `wm.open()`.
 
 Add a listener.
 
+#### `wmWin.$once(event: string, listener: Function): WM_Window`
+
+Add a one-time listener.
+
 #### `wmWin.$off(event: string, listener: Function): WM_Window`
 
 Remove a listener.
+
+#### `wmWin.$offAll(event: string, listener: Function): WM_Window`
+
+Removes all listeners, or those of the specified event name.
 
 #### `wmWin.$emit(event: string, ...args: any[]): WM_Window`
 

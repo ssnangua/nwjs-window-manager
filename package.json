@@ -1,6 +1,6 @@
 {
   "name": "nwjs-window-manager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Window manager for NW.js.",
   "scripts": {
     "tsc": "tsc",

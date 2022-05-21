@@ -38,5 +38,7 @@ WM\_Window extends nw.win
 |  --- | --- |
 |  [$emit(event, args)](./nwjs-window-manager.wm_window._emit.md) |  |
 |  [$off(event, listener)](./nwjs-window-manager.wm_window._off.md) |  |
+|  [$offAll(event)](./nwjs-window-manager.wm_window._offall.md) |  |
 |  [$on(event, listener)](./nwjs-window-manager.wm_window._on.md) |  |
+|  [$once(event, listener)](./nwjs-window-manager.wm_window._once.md) |  |
 

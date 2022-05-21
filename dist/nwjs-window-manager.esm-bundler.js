@@ -151,7 +151,7 @@ function open(url, options = {}, callback = () => { }) {
 }
 function get(win) {
     if (!win)
-        return manage(nw.Window.get());
+        return undefined;
     if (typeof win === "string")
         return instances[win];
     if ("nwWin" in win)
@@ -281,8 +281,16 @@ function manage(win, options = {}) {
                 emitter.on(event, listener);
                 return wmWin;
             },
+            $once(event, listener) {
+                emitter.once(event, listener);
+                return wmWin;
+            },
             $off(event, listener) {
                 emitter.off(event, listener);
+                return wmWin;
+            },
+            $offAll(event) {
+                emitter.removeAllListeners(event);
                 return wmWin;
             },
             $emit(event, ...args) {
@@ -425,6 +433,7 @@ function manage(win, options = {}) {
     }
     return undefined;
 }
+const emitter = new EventEmitter();
 /**
  * @public
  */
@@ -433,6 +442,27 @@ const wm = Object.assign(manage, {
     get,
     getAll,
     config,
+    // Merge emitter
+    $on(event, listener) {
+        emitter.on(event, listener);
+        return wm;
+    },
+    $once(event, listener) {
+        emitter.once(event, listener);
+        return wm;
+    },
+    $off(event, listener) {
+        emitter.off(event, listener);
+        return wm;
+    },
+    $offAll(event) {
+        emitter.removeAllListeners(event);
+        return wm;
+    },
+    $emit(event, ...args) {
+        emitter.emit.call(emitter, event, ...args);
+        return wm;
+    },
 });
 
 export { wm };

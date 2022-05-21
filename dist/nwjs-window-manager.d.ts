@@ -20,6 +20,11 @@ export declare type MaybeWindow = WM_Window | NWJS_Helpers.win | string;
  * @param get - Get WM_Window. When `win` is omitted, will return the current WM_Window.
  * @param getAll - Get all WM_Window instances
  * @param config - Set window manager
+ * @param $on - Add a global listener.
+ * @param $once - Add a one-time global listener.
+ * @param $off - Remove a global listener.
+ * @param $offAll - Removes all global listeners, or those of the specified event name.
+ * @param $emit - Synchronously calls each of the global listeners.
  *
  * @public
  */
@@ -29,6 +34,11 @@ export declare interface WindowManager {
     get: WM_GetWindow;
     getAll: WM_GetAllWindow;
     config: WM_ConfigWindowManager;
+    $on(event: string, listener: Function): WindowManager;
+    $once(event: string, listener: Function): WindowManager;
+    $off(event: string, listener: Function): WindowManager;
+    $offAll(event?: string): WindowManager;
+    $emit(event: string, ...args: any[]): WindowManager;
 }
 
 /**
@@ -81,8 +91,7 @@ export declare interface WM_GetAllWindow {
  * @public
  */
 export declare interface WM_GetWindow {
-    (): WM_Window | undefined;
-    (win?: MaybeWindow): WM_Window | undefined;
+    (win: MaybeWindow): WM_Window | undefined;
 }
 
 /**
@@ -145,7 +154,9 @@ export declare interface WM_Options {
  * @param isMaximize - Get whether the window is maximize.
  * @param open - Open a child window.
  * @param $on - Add a listener.
+ * @param $once - Add a one-time listener.
  * @param $off - Remove a listener.
+ * @param $offAll - Removes all listeners, or those of the specified event name.
  * @param $emit - Synchronously calls each of the listeners.
  *
  * @remarks
@@ -165,7 +176,9 @@ export declare interface WM_Window extends NWJS_Helpers.win {
     readonly isMaximize: boolean;
     open: WM_OpenWMWindow;
     $on(event: string, listener: Function): WM_Window;
+    $once(event: string, listener: Function): WM_Window;
     $off(event: string, listener: Function): WM_Window;
+    $offAll(event?: string): WM_Window;
     $emit(event: string, ...args: any[]): WM_Window;
 }
 
