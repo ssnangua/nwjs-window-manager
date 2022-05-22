@@ -287,7 +287,7 @@ Synchronously calls each of the listeners.
 
 ## Change Log
 
-### 1.0.5
+### 1.0.6
 
 - `WM_Options`: Add `x/y/width/height` options, you can set the window's position and size when manage/get the nw.win by `wm()` now.
 - `WM_Window`: Add `wmWin.centerToParent()` and `wmWin.centerToScreen()` methods.

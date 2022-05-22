@@ -149,8 +149,8 @@ function setWinProps(wmWin, options) {
     if (parent)
         wmWin.parent = manage(parent);
     // modal
-    if (typeof modal === "boolean" && wmWin.parent)
-        wmWin.parent.modal = modal;
+    if (typeof modal === "boolean")
+        wmWin.modalParent = modal;
     // alwaysOnTop
     if (isNeedAlwaysOnTop(wmWin))
         wmWin.alwaysOnTop = true;
