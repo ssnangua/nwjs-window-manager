@@ -17,8 +17,12 @@ export interface WM_Options
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [always\_on\_top?](./nwjs-window-manager.wm_options.always_on_top.md) | boolean \| undefined | <i>(Optional)</i> |
+|  [height?](./nwjs-window-manager.wm_options.height.md) | number | <i>(Optional)</i> |
 |  [modal?](./nwjs-window-manager.wm_options.modal.md) | boolean | <i>(Optional)</i> |
 |  [name?](./nwjs-window-manager.wm_options.name.md) | string | <i>(Optional)</i> |
 |  [parent?](./nwjs-window-manager.wm_options.parent.md) | [MaybeWindow](./nwjs-window-manager.maybewindow.md) | <i>(Optional)</i> |
 |  [position?](./nwjs-window-manager.wm_options.position.md) | string \| undefined | <i>(Optional)</i> |
+|  [width?](./nwjs-window-manager.wm_options.width.md) | number | <i>(Optional)</i> |
+|  [x?](./nwjs-window-manager.wm_options.x.md) | number | <i>(Optional)</i> |
+|  [y?](./nwjs-window-manager.wm_options.y.md) | number | <i>(Optional)</i> |
 

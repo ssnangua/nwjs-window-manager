@@ -123,40 +123,6 @@ function removeModal(win) {
 // WM_Window instances
 const instances = {};
 let instanceId = Date.now();
-function open(url, options = {}, callback = () => { }) {
-    return new Promise((resolve) => {
-        if (typeof options === "function") {
-            callback = options;
-            options = {};
-        }
-        const { name = `wm_${++instanceId}`, parent, modal } = options, nwOptions = __rest(options, ["name", "parent", "modal"]);
-        const { position, always_on_top } = options;
-        // Singleton
-        if (instances[name]) {
-            const wmWin = instances[name];
-            wmWin.focus();
-            callback(wmWin);
-            return resolve(wmWin);
-        }
-        const isShow = nwOptions.show !== false;
-        nwOptions.show = false;
-        nw.Window.open(url, nwOptions, (nwWin) => {
-            if (!nwWin)
-                return;
-            const wmWin = manage(nwWin, {
-                name,
-                parent,
-                modal,
-                position,
-                always_on_top,
-            });
-            if (isShow)
-                wmWin.show();
-            callback(wmWin);
-            resolve(wmWin);
-        });
-    });
-}
 function get(win) {
     if (!win)
         return undefined;
@@ -185,6 +151,34 @@ function isNeedAlwaysOnTop(wmWin) {
         (wmWin.parent && isNeedAlwaysOnTop(wmWin.parent)) ||
         false);
 }
+function setWinProps(wmWin, options) {
+    const { parent, modal, always_on_top, position, x, y, width, height } = options;
+    // parent
+    if (parent)
+        wmWin.parent = manage(parent);
+    // modal
+    if (typeof modal === "boolean" && wmWin.parent)
+        wmWin.parent.modal = modal;
+    // alwaysOnTop
+    if (isNeedAlwaysOnTop(wmWin))
+        wmWin.alwaysOnTop = true;
+    else if (typeof always_on_top === "boolean")
+        wmWin.alwaysOnTop = always_on_top;
+    // size
+    if (typeof width === "number")
+        wmWin.width = width;
+    if (typeof height === "number")
+        wmWin.height = height;
+    // position
+    if (position === "center")
+        wmWin.centerToScreen();
+    else if (position === "parentCenter")
+        wmWin.centerToParent();
+    if (typeof x === "number")
+        wmWin.x = x;
+    if (typeof y === "number")
+        wmWin.y = y;
+}
 /**
  * Manage a window
  * @param win - The window to manage
@@ -194,18 +188,17 @@ function isNeedAlwaysOnTop(wmWin) {
 function manage(win, options = {}) {
     if (!win)
         return undefined;
-    const instance = get(win);
-    if (instance) {
-        const { parent, modal } = options;
-        if (parent)
-            instance.parent = manage(parent);
-        if (modal !== undefined && instance.parent)
-            instance.parent.modal = modal;
-        return instance;
+    const wmWin = get(win);
+    if (wmWin) {
+        if (options.name)
+            console.warn(`The WM_Window instance already exists, the name "${wmWin.name}" is readonly and cannot be reassigned.`);
+        setWinProps(wmWin, options);
+        return wmWin;
     }
     if (typeof win === "object" && "cWindow" in win) {
-        const nwWin = win;
         const emitter = new EventEmitter();
+        const nwWin = win;
+        let wmWin;
         // Private properties
         let name = options.name || `wm_${++instanceId}`, _modalParent = options.modal || false, _modal = false, _alwaysOnTop = false, _isMinimize = false, _isMaximize = false, _parent = undefined, _children = [];
         function addToParent(parent) {
@@ -230,7 +223,7 @@ function manage(win, options = {}) {
         // Proxy close event
         const closeHandlers = [];
         // Merge the properties and methods of WM_Window into nw window
-        const wmWin = Object.assign(nwWin, {
+        wmWin = Object.assign(nwWin, {
             nwWin,
             name,
             modalParent: _modalParent,
@@ -247,6 +240,21 @@ function manage(win, options = {}) {
                     options = {};
                 }
                 return open(url, Object.assign({ parent: wmWin }, options), callback);
+            },
+            // Center relative to parent
+            centerToParent() {
+                if (wmWin.parent) {
+                    wmWin.x = Math.round(wmWin.parent.x + (wmWin.parent.width - wmWin.width) / 2);
+                    wmWin.y = Math.round(wmWin.parent.y + (wmWin.parent.height - wmWin.height) / 2);
+                }
+                return wmWin;
+            },
+            // Center relative to screen
+            centerToScreen() {
+                const screen = wmWin.window.screen;
+                wmWin.x = Math.round(screen.availLeft + (screen.availWidth - wmWin.width) / 2);
+                wmWin.y = Math.round(screen.availTop + (screen.availHeight - wmWin.height) / 2);
+                return wmWin;
             },
             // Override setAlwaysOnTop method
             // If the window is always on top, all child windows should also be always on top.
@@ -385,17 +393,7 @@ function manage(win, options = {}) {
                 },
             },
         });
-        // parent
-        if (options.parent)
-            wmWin.parent = manage(options.parent);
-        // alwayOnTop
-        if (options.always_on_top || isNeedAlwaysOnTop(wmWin))
-            wmWin.alwaysOnTop = true;
-        // Center relative to parent
-        if (wmWin.parent && options.position === "parentCenter") {
-            wmWin.x = wmWin.parent.x + (wmWin.parent.width - wmWin.width) / 2;
-            wmWin.y = wmWin.parent.y + (wmWin.parent.height - wmWin.height) / 2;
-        }
+        setWinProps(wmWin, options);
         // Cache instance
         instances[name] = wmWin;
         wmWin.on("focus", () => {
@@ -440,6 +438,40 @@ function manage(win, options = {}) {
         return wmWin;
     }
     return undefined;
+}
+function open(url, options = {}, callback = () => { }) {
+    return new Promise((resolve) => {
+        if (typeof options === "function") {
+            callback = options;
+            options = {};
+        }
+        const { name = `wm_${++instanceId}`, parent, modal } = options, nwOptions = __rest(options, ["name", "parent", "modal"]);
+        const { position, always_on_top } = options;
+        // Singleton
+        if (instances[name]) {
+            const wmWin = instances[name];
+            wmWin.focus();
+            callback(wmWin);
+            return resolve(wmWin);
+        }
+        const isShow = nwOptions.show !== false;
+        nwOptions.show = false;
+        nw.Window.open(url, nwOptions, (nwWin) => {
+            if (!nwWin)
+                return;
+            const wmWin = manage(nwWin, {
+                name,
+                parent,
+                modal,
+                position,
+                always_on_top,
+            });
+            if (isShow)
+                wmWin.show();
+            callback(wmWin);
+            resolve(wmWin);
+        });
+    });
 }
 const emitter = new EventEmitter();
 /**

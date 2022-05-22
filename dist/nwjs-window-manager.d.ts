@@ -130,6 +130,10 @@ export declare interface WM_OpenWMWindow {
  * @param modal - Whether to make the parent window modal.
  * @param always_on_top - Whether the window is always on top of other windows.
  * @param position - Controls where window will be put. Can be `null` or `center` or `mouse` or **`parentCenter`**
+ * @param x - Left offset from window frame to screen.
+ * @param y - Top offset from window frame to screen.
+ * @param width - window's width, including the window's frame.
+ * @param height - window's height, including the window's frame.
  *
  * @public
  */
@@ -139,6 +143,10 @@ export declare interface WM_Options {
     modal?: boolean;
     always_on_top?: boolean | undefined;
     position?: string | undefined;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
 }
 
 /**
@@ -153,6 +161,8 @@ export declare interface WM_Options {
  * @param isMinimize - Get whether the window is minimize.
  * @param isMaximize - Get whether the window is maximize.
  * @param open - Open a child window.
+ * @param centerToParent - Center relative to parent.
+ * @param centerToScreen - Center relative to screen.
  * @param $on - Add a listener.
  * @param $once - Add a one-time listener.
  * @param $off - Remove a listener.
@@ -175,6 +185,8 @@ export declare interface WM_Window extends NWJS_Helpers.win {
     readonly isMinimize: boolean;
     readonly isMaximize: boolean;
     open: WM_OpenWMWindow;
+    centerToParent(): WM_Window;
+    centerToScreen(): WM_Window;
     $on(event: string, listener: Function): WM_Window;
     $once(event: string, listener: Function): WM_Window;
     $off(event: string, listener: Function): WM_Window;

@@ -39,6 +39,8 @@ function domReady(document: Document): Promise<void> {
  * @param isMinimize - Get whether the window is minimize.
  * @param isMaximize - Get whether the window is maximize.
  * @param open - Open a child window.
+ * @param centerToParent - Center relative to parent.
+ * @param centerToScreen - Center relative to screen.
  * @param $on - Add a listener.
  * @param $once - Add a one-time listener.
  * @param $off - Remove a listener.
@@ -61,6 +63,8 @@ export interface WM_Window extends NWJS_Helpers.win {
   readonly isMinimize: boolean;
   readonly isMaximize: boolean;
   open: WM_OpenWMWindow;
+  centerToParent(): WM_Window;
+  centerToScreen(): WM_Window;
   $on(event: string, listener: Function): WM_Window;
   $once(event: string, listener: Function): WM_Window;
   $off(event: string, listener: Function): WM_Window;
@@ -85,6 +89,10 @@ export type WM_OpenCallback = (wmWin: WM_Window) => void;
  * @param modal - Whether to make the parent window modal.
  * @param always_on_top - Whether the window is always on top of other windows.
  * @param position - Controls where window will be put. Can be `null` or `center` or `mouse` or **`parentCenter`**
+ * @param x - Left offset from window frame to screen.
+ * @param y - Top offset from window frame to screen.
+ * @param width - window's width, including the window's frame.
+ * @param height - window's height, including the window's frame.
  *
  * @public
  */
@@ -94,6 +102,10 @@ export interface WM_Options {
   modal?: boolean;
   always_on_top?: boolean | undefined;
   position?: string | undefined;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
 }
 
 /**
@@ -226,54 +238,6 @@ async function removeModal(win: WM_Window) {
 const instances: { [name: string]: WM_Window } = {};
 let instanceId = Date.now();
 
-function open(
-  url: string,
-  options: WM_OpenOptions | WM_OpenCallback = {},
-  callback: WM_OpenCallback = () => {}
-): Promise<WM_Window> {
-  return new Promise((resolve) => {
-    if (typeof options === "function") {
-      callback = options;
-      options = {};
-    }
-    const {
-      name = `wm_${++instanceId}`,
-      parent,
-      modal,
-      ...nwOptions
-    } = options;
-    const { position, always_on_top } = options;
-
-    // Singleton
-    if (instances[name]) {
-      const wmWin = instances[name];
-      wmWin.focus();
-      callback(wmWin);
-      return resolve(wmWin);
-    }
-
-    const isShow = nwOptions.show !== false;
-    nwOptions.show = false;
-
-    nw.Window.open(url, nwOptions, (nwWin) => {
-      if (!nwWin) return;
-
-      const wmWin = manage(nwWin, {
-        name,
-        parent,
-        modal,
-        position,
-        always_on_top,
-      }) as WM_Window;
-
-      if (isShow) wmWin.show();
-
-      callback(wmWin);
-      resolve(wmWin);
-    });
-  });
-}
-
 function get(win: MaybeWindow): WM_Window | undefined {
   if (!win) return undefined;
   if (typeof win === "string") return instances[win];
@@ -304,6 +268,27 @@ function isNeedAlwaysOnTop(wmWin: WM_Window): boolean {
   );
 }
 
+function setWinProps(wmWin: WM_Window, options: WM_Options) {
+  const { parent, modal, always_on_top, position, x, y, width, height } =
+    options;
+  // parent
+  if (parent) wmWin.parent = manage(parent);
+  // modal
+  if (typeof modal === "boolean" && wmWin.parent) wmWin.parent.modal = modal;
+  // alwaysOnTop
+  if (isNeedAlwaysOnTop(wmWin)) wmWin.alwaysOnTop = true;
+  else if (typeof always_on_top === "boolean")
+    wmWin.alwaysOnTop = always_on_top;
+  // size
+  if (typeof width === "number") wmWin.width = width;
+  if (typeof height === "number") wmWin.height = height;
+  // position
+  if (position === "center") wmWin.centerToScreen();
+  else if (position === "parentCenter") wmWin.centerToParent();
+  if (typeof x === "number") wmWin.x = x;
+  if (typeof y === "number") wmWin.y = y;
+}
+
 /**
  * Manage a window
  * @param win - The window to manage
@@ -315,16 +300,21 @@ function manage(
   options: WM_Options = {}
 ): WM_Window | undefined {
   if (!win) return undefined;
-  const instance = get(win);
-  if (instance) {
-    const { parent, modal } = options;
-    if (parent) instance.parent = manage(parent);
-    if (modal !== undefined && instance.parent) instance.parent.modal = modal;
-    return instance;
+
+  const wmWin = get(win);
+  if (wmWin) {
+    if (options.name)
+      console.warn(
+        `The WM_Window instance already exists, the name "${wmWin.name}" is readonly and cannot be reassigned.`
+      );
+    setWinProps(wmWin, options);
+    return wmWin;
   }
+
   if (typeof win === "object" && "cWindow" in win) {
-    const nwWin = win as NWJS_Helpers.win;
     const emitter = new EventEmitter();
+    const nwWin = win as NWJS_Helpers.win;
+    let wmWin: WM_Window;
 
     // Private properties
     let name = options.name || `wm_${++instanceId}`,
@@ -361,7 +351,7 @@ function manage(
     const closeHandlers: Function[] = [];
 
     // Merge the properties and methods of WM_Window into nw window
-    const wmWin: WM_Window = Object.assign(nwWin, {
+    wmWin = Object.assign(nwWin, {
       nwWin,
       name,
       modalParent: _modalParent,
@@ -382,6 +372,29 @@ function manage(
           options = {};
         }
         return open(url, { parent: wmWin, ...options }, callback);
+      },
+      // Center relative to parent
+      centerToParent() {
+        if (wmWin.parent) {
+          wmWin.x = Math.round(
+            wmWin.parent.x + (wmWin.parent.width - wmWin.width) / 2
+          );
+          wmWin.y = Math.round(
+            wmWin.parent.y + (wmWin.parent.height - wmWin.height) / 2
+          );
+        }
+        return wmWin;
+      },
+      // Center relative to screen
+      centerToScreen() {
+        const screen: any = wmWin.window.screen;
+        wmWin.x = Math.round(
+          screen.availLeft + (screen.availWidth - wmWin.width) / 2
+        );
+        wmWin.y = Math.round(
+          screen.availTop + (screen.availHeight - wmWin.height) / 2
+        );
+        return wmWin;
       },
       // Override setAlwaysOnTop method
       // If the window is always on top, all child windows should also be always on top.
@@ -514,18 +527,7 @@ function manage(
       },
     });
 
-    // parent
-    if (options.parent) wmWin.parent = manage(options.parent);
-
-    // alwayOnTop
-    if (options.always_on_top || isNeedAlwaysOnTop(wmWin))
-      wmWin.alwaysOnTop = true;
-
-    // Center relative to parent
-    if (wmWin.parent && options.position === "parentCenter") {
-      wmWin.x = wmWin.parent.x + (wmWin.parent.width - wmWin.width) / 2;
-      wmWin.y = wmWin.parent.y + (wmWin.parent.height - wmWin.height) / 2;
-    }
+    setWinProps(wmWin, options);
 
     // Cache instance
     instances[name] = wmWin;
@@ -571,6 +573,54 @@ function manage(
   }
 
   return undefined;
+}
+
+function open(
+  url: string,
+  options: WM_OpenOptions | WM_OpenCallback = {},
+  callback: WM_OpenCallback = () => {}
+): Promise<WM_Window> {
+  return new Promise((resolve) => {
+    if (typeof options === "function") {
+      callback = options;
+      options = {};
+    }
+    const {
+      name = `wm_${++instanceId}`,
+      parent,
+      modal,
+      ...nwOptions
+    } = options;
+    const { position, always_on_top } = options;
+
+    // Singleton
+    if (instances[name]) {
+      const wmWin = instances[name];
+      wmWin.focus();
+      callback(wmWin);
+      return resolve(wmWin);
+    }
+
+    const isShow = nwOptions.show !== false;
+    nwOptions.show = false;
+
+    nw.Window.open(url, nwOptions, (nwWin) => {
+      if (!nwWin) return;
+
+      const wmWin = manage(nwWin, {
+        name,
+        parent,
+        modal,
+        position,
+        always_on_top,
+      }) as WM_Window;
+
+      if (isShow) wmWin.show();
+
+      callback(wmWin);
+      resolve(wmWin);
+    });
+  });
 }
 
 /**

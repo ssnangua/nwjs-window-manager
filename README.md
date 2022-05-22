@@ -87,7 +87,7 @@ win1.$on("win1_on", (msg) => {
 
 // wm global message
 wm.$on("global_msg", (msg) => {
-  console.log("global_msg", msg);
+  console.log("[global_msg]", msg);
 });
 ```
 
@@ -130,6 +130,10 @@ Manage a nw.win as WM_Window, or get a WM_Window by name or nw.win.
   - `modal` boolean (optional) - Whether to make the parent window modal.
   - `always_on_top` boolean (optional) - Whether the window is always on top of other windows.
   - `position` string (optional) - Controls where window will be put. Can be `null` or `center` or `mouse` or **`parentCenter`**
+  - `x` number (optional) - Left offset from window frame to screen.
+  - `y` number (optional) - Top offset from window frame to screen.
+  - `width` number (optional) - window's width, including the window's frame.
+  - `height` number (optional) - window's height, including the window's frame.
 
 Returns `WM_Window | undefined` - Returns wm window if `maybeWin` is valid, otherwise returns undefined.
 
@@ -140,7 +144,7 @@ Open a new WM_Window.
 - `url` string - URL to be loaded in the opened window
 - `options` WM_OpenOptions (optional) - Open options
   - `name` string (optional) - Window's name.
-  - `parent` WM_Window (optional) - Parent window.
+  - `parent` WM_Window | nw.win | string (optional) - Parent window.
   - `modal` boolean (optional) - Whether to make the parent window modal.
   - `always_on_top` boolean (optional) - Whether the window is always on top of other windows.
   - `position` string (optional) - Controls where window will be put. Can be `null` or `center` or `mouse` or **`parentCenter`**
@@ -157,8 +161,6 @@ Get a WM_Window by name or nw.win.
 - `win` WM_Window | nw.win | string - win or win's name
 
 Returns `WM_Window | undefined` - Returns wm window if `win` is valid, otherwise returns undefined.
-
-When `win` is omitted, will return the current WM_Window.
 
 ### `wm.getAll([callback])`
 
@@ -255,6 +257,14 @@ Get whether the window is maximize.
 
 Open a child window. See `wm.open()`.
 
+#### `wmWin.centerToParent(): WM_Window`
+
+Center relative to parent.
+
+#### `wmWin.centerToScreen(): WM_Window`
+
+Center relative to screen.
+
 #### `wmWin.$on(event: string, listener: Function): WM_Window`
 
 Add a listener.
@@ -274,3 +284,10 @@ Removes all listeners, or those of the specified event name.
 #### `wmWin.$emit(event: string, ...args: any[]): WM_Window`
 
 Synchronously calls each of the listeners.
+
+## Change Log
+
+### 1.0.5
+
+- `WM_Options`: Add `x/y/width/height` options, you can set the window's position and size when manage/get the nw.win by `wm()` now.
+- `WM_Window`: Add `wmWin.centerToParent()` and `wmWin.centerToScreen()` methods.

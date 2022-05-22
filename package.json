@@ -1,6 +1,6 @@
 {
   "name": "nwjs-window-manager",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Window manager for NW.js.",
   "scripts": {
     "tsc": "tsc",
@@ -8,6 +8,7 @@
     "api": "api-extractor run --local",
     "doc": "api-documenter markdown -i ./temp -o ./docs/api",
     "build": "npm run tsc && npm run rollup && npm run api && npm run doc",
+    "clean": "rd/s/q dist docs lib temp",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "jsdelivr": "./dist/nwjs-window-manager.js",

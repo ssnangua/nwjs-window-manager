@@ -41,4 +41,6 @@ WM\_Window extends nw.win
 |  [$offAll(event)](./nwjs-window-manager.wm_window._offall.md) |  |
 |  [$on(event, listener)](./nwjs-window-manager.wm_window._on.md) |  |
 |  [$once(event, listener)](./nwjs-window-manager.wm_window._once.md) |  |
+|  [centerToParent()](./nwjs-window-manager.wm_window.centertoparent.md) |  |
+|  [centerToScreen()](./nwjs-window-manager.wm_window.centertoscreen.md) |  |
 
