@@ -1,12 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('node:events')) :
-    typeof define === 'function' && define.amd ? define(['exports', 'node:events'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global["nwjs-window-manager"] = {}, global.require$$0));
-})(this, (function (exports, require$$0) { 'use strict';
-
-    function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-    var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+    typeof define === 'function' && define.amd ? define(['exports'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global["nwjs-window-manager"] = {}));
+})(this, (function (exports) { 'use strict';
 
     /******************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -53,7 +49,7 @@
      *
      * @packageDocumentation
      */
-    const EventEmitter = require$$0__default["default"];
+    const EventEmitter = nw.require("node:events");
     /**
      * To make sure the document is available
      * @param document

@@ -1,5 +1,3 @@
-import require$$0 from 'node:events';
-
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -45,7 +43,7 @@ function __awaiter(thisArg, _arguments, P, generator) {
  *
  * @packageDocumentation
  */
-const EventEmitter = require$$0;
+const EventEmitter = nw.require("node:events");
 /**
  * To make sure the document is available
  * @param document

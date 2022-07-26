@@ -192,7 +192,7 @@ Removes all global listeners, or those of the specified event name.
 
 Synchronously calls each of the global listeners.
 
-###
+### 
 
 ### `wm.config(options)`
 
@@ -291,3 +291,7 @@ Synchronously calls each of the listeners.
 
 - `WM_Options`: Add `x/y/width/height` options, you can set the window's position and size when manage/get the nw.win by `wm()` now.
 - `WM_Window`: Add `wmWin.centerToParent()` and `wmWin.centerToScreen()` methods.
+
+### 1.0.7
+
+* Fix: use `nw.require(...)` instead of `import ... from ...` to import `node:events`.

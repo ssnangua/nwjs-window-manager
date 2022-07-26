@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-const EventEmitter = require("node:events");
+const EventEmitter = nw.require("node:events");
 
 /**
  * To make sure the document is available

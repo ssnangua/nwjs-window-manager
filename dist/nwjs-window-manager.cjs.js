@@ -2,12 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var require$$0 = require('node:events');
-
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
-
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -53,7 +47,7 @@ function __awaiter(thisArg, _arguments, P, generator) {
  *
  * @packageDocumentation
  */
-const EventEmitter = require$$0__default["default"];
+const EventEmitter = nw.require("node:events");
 /**
  * To make sure the document is available
  * @param document
